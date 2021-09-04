@@ -2,22 +2,19 @@ package utils
 
 import (
 	"apus-sample/common/constant"
-	"context"
 )
 import "github.com/gin-gonic/gin"
 
-func GetCompanyCodeFromCtx(ctx context.Context) (companyCode string) {
-	defer func() {
-		if companyCode == ""{
-			companyCode = constant.DefaultSchema
-		}
-	}()
-	switch ctx.(type) {
-	case *gin.Context:
-		ginCtx := ctx.(*gin.Context)
-		companyCode = ginCtx.GetHeader("company_code")
-	default:
+func GetCompanyCode(c *gin.Context) string {
+	companyCode := c.GetHeader("company_code")
+	if companyCode == "" {
 		companyCode = constant.DefaultSchema
 	}
 	return companyCode
+}
+
+func GetQueries(c *gin.Context) map[string]string {
+	queries := make(map[string]string)
+	_ = c.BindQuery(queries)
+	return queries
 }

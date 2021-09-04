@@ -30,22 +30,22 @@ func New() (*Database, error) {
 	return s, nil
 }
 
-func (s *Database) MustGet(ctx context.Context, schemaName string) Conn {
+func (s *Database) MustGet(ctx context.Context, schemaName string) *gorm.DB {
 	conn, err := s.Get(ctx, schemaName)
 	utils.PanicWhenError(err)
 	return conn
 }
 
-func (s *Database) Get(ctx context.Context, schemaName string) (conn Conn, err error) {
+func (s *Database) Get(ctx context.Context, schemaName string) (conn *gorm.DB, err error) {
 	schemaConn, found := s.schemas.Load(schemaName)
 	if !found {
 		dbConn, err := s.connectAndStore(schemaName)
 		if err != nil {
 			return nil, err
 		}
-		return &databaseConn{orm: dbConn, Context: ctx}, nil
+		return dbConn.WithContext(ctx), nil
 	} else {
-		return &databaseConn{orm: schemaConn.(*gorm.DB), Context: ctx}, nil
+		return schemaConn.(*gorm.DB).WithContext(ctx), nil
 	}
 }
 
@@ -64,4 +64,3 @@ func (s *Database) connectAndStore(schemaName string) (*gorm.DB, error) {
 	s.schemas.Store(schemaName, dbConn)
 	return dbConn, err
 }
-
