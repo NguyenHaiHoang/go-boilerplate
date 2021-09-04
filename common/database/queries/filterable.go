@@ -102,13 +102,10 @@ func Filter(query *gorm.DB, filter Filterable, filterFields map[string]string) *
 		if suffixType == arrayValueType {
 			handler := arrayValueSuffixHandlers[suffix]
 			result = handler(result, colName, strings.Split(value, ","))
-		} else if suffixType == singleValueType {
+		}
+		if suffixType == singleValueType {
 			handler := singleValueSuffixHandlers[suffix]
 			result = handler(result, colName, value)
-		} else {
-			if colName == "" {
-				continue
-			}
 		}
 
 	}
